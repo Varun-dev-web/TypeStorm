@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="light" />
+  <meta name="description" content="TypeStorm — an interactive typing speed and accuracy tester with combos, keyclicks, difficulty modes and a savage results screen." />
+  <title>TypeStorm — Typing Speed &amp; Accuracy Tester</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <a class="skip-link" href="#typing-card">Skip to the typing test</a>
+
+  <div class="app" id="app">
+
+    <!-- ============================ HEADER ============================ -->
+    <header class="app-header">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="6" width="20" height="12" rx="3"></rect>
+            <path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M7 14h10"></path>
+          </svg>
+        </span>
+        <span class="brand-text">
+          <span class="brand-name">TypeStorm</span>
+          <span class="brand-sub">Speed &amp; accuracy, weaponised</span>
+        </span>
+      </div>
+
+      <div class="toolbar">
+        <div class="segmented" role="radiogroup" aria-label="Difficulty" id="difficulty-group">
+          <button class="seg-btn is-active" type="button" role="radio" aria-checked="true" data-difficulty="easy">Easy</button>
+          <button class="seg-btn" type="button" role="radio" aria-checked="false" data-difficulty="normal">Normal</button>
+          <button class="seg-btn" type="button" role="radio" aria-checked="false" data-difficulty="hard">Hard</button>
+          <button class="seg-btn" type="button" role="radio" aria-checked="false" data-difficulty="chaos">Chaos</button>
+        </div>
+
+        <button class="icon-btn" type="button" id="sound-toggle" aria-pressed="true"
+                aria-label="Mechanical keyclick sounds: on">
+          <svg class="icon-on" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M11 5 6 9H3v6h3l5 4z"></path><path d="M15.5 8.5a5 5 0 0 1 0 7"></path><path d="M18.5 5.5a9 9 0 0 1 0 13"></path>
+          </svg>
+          <svg class="icon-off" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M11 5 6 9H3v6h3l5 4z"></path><path d="m16 9 5 6M21 9l-5 6"></path>
+          </svg>
+        </button>
+
+        <button class="icon-btn" type="button" id="calm-toggle" aria-pressed="false"
+                aria-label="Calm mode: off">
+          <svg class="icon-calm-off" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M18.4 5.6 17 7M7 17l-1.4 1.4"></path>
+            <circle cx="12" cy="12" r="3.4"></circle>
+          </svg>
+          <svg class="icon-calm-on" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="4"></circle>
+            <path d="M12 2v2M12 20v2M2 12h2M20 12h2"></path>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- ============================ TELEMETRY ============================ -->
+    <section class="telemetry" aria-label="Live statistics">
+      <div class="stat-card" id="card-time">
+        <span class="stat-label">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg>
+          Time remaining
+        </span>
+        <strong class="stat-value stat-value--mono" id="stat-time">1:00</strong>
+        <div class="stat-bar"><i id="time-bar"></i></div>
+      </div>
+
+      <div class="stat-card" id="card-mistakes">
+        <span class="stat-label">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="m9 9 6 6M15 9l-6 6"></path></svg>
+          Mistakes
+        </span>
+        <strong class="stat-value stat-value--mono" id="stat-mistakes">0</strong>
+        <span class="stat-foot" id="stat-mistakes-foot">live in text</span>
+      </div>
+
+      <div class="stat-card stat-card--hero" id="card-wpm">
+        <span class="stat-label">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M13 2 4 14h6l-1 8 9-12h-6z"></path></svg>
+          Net WPM
+        </span>
+        <strong class="stat-value stat-value--mono" id="stat-wpm">0</strong>
+        <span class="stat-foot" id="stat-wpm-foot">type to start</span>
+      </div>
+
+      <div class="stat-card" id="card-acc">
+        <span class="stat-label">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><circle cx="12" cy="12" r="4"></circle></svg>
+          Accuracy
+        </span>
+        <strong class="stat-value stat-value--mono" id="stat-acc">100%</strong>
+        <span class="stat-foot" id="stat-acc-foot">first pass</span>
+      </div>
+    </section>
+
+    <!-- ============================ TYPING CARD ============================ -->
+    <main class="typing-card" id="typing-card">
+      <div class="typing-head">
+        <div class="typing-meta">
+          <span class="chip chip--mode" id="chip-difficulty">Easy</span>
+          <span class="chip chip--source" id="chip-source">Quote 1 of 10</span>
+        </div>
+
+        <div class="combo" id="combo" aria-hidden="true">
+          <span class="combo-flame" id="combo-flame">🔥</span>
+          <span class="combo-text"><b id="combo-count">0</b> combo</span>
+          <span class="combo-mult" id="combo-mult">×1.00</span>
+        </div>
+      </div>
+
+      <div class="quote-shell">
+        <p class="quote-display" id="quote-display" aria-hidden="true"></p>
+
+        <label class="visually-hidden" for="quote-input">Type the quote shown above</label>
+        <input
+          class="quote-input"
+          id="quote-input"
+          type="text"
+          inputmode="text"
+          lang="en"
+          autocomplete="off"
+          autocorrect="off"
+          autocapitalize="off"
+          spellcheck="false"
+          enterkeyhint="done"
+          aria-describedby="input-help"
+          aria-autocomplete="none" />
+        <p class="visually-hidden" id="input-help">Start typing to begin the one-minute timer. Backspace is allowed. Press Escape to restart.</p>
+      </div>
+
+      <!-- Mascot -->
+      <aside class="mascot" id="mascot" data-state="idle" aria-hidden="true">
+        <div class="mascot-frame">
+          <img id="mascot-img" alt="" width="96" height="96" decoding="async" />
+          <span class="mascot-emoji" id="mascot-emoji">😴</span>
+        </div>
+        <span class="mascot-caption" id="mascot-caption">waiting for you…</span>
+      </aside>
+
+      <div class="accuracy-row">
+        <span class="accuracy-label">Accuracy health</span>
+        <div class="accuracy-track"><i id="acc-bar"></i></div>
+        <span class="rank-chip" id="rank-chip">Unranked</span>
+      </div>
+
+      <div class="typing-foot">
+        <div class="hint" id="hint-line">
+          <span class="dot" aria-hidden="true"></span>
+          <span id="hint-text">Start typing to begin the clock</span>
+        </div>
+        <div class="actions">
+          <button class="btn btn--filled" type="button" id="btn-restart">
+            <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11a9 9 0 1 0 3-6.7"></path><path d="M3 4v7h7"></path></svg>
+            Restart
+          </button>
+          <button class="btn btn--outlined" type="button" id="btn-new">
+            <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h11a4 4 0 0 1 0 8H9"></path><path d="m12 4-3 3 3 3"></path><path d="m12 12-3 3 3 3"></path><path d="M4 7v10"></path></svg>
+            New quote
+          </button>
+        </div>
+      </div>
+
+      <ul class="coach" id="coach" hidden>
+        <li><span class="coach-key">1</span> Start typing — the 60-second clock starts on your first key.</li>
+        <li><span class="coach-key">2</span> Mistakes turn red. Backspace is allowed, but every slip still costs accuracy.</li>
+        <li><span class="coach-key">3</span> <kbd>Esc</kbd> restarts, <kbd>Tab</kbd> reaches the buttons. <button class="link-btn" type="button" id="coach-dismiss">Got it</button></li>
+      </ul>
+    </main>
+
+  </div>
+
+  <!-- ============================ RESULTS MODAL ============================ -->
+  <div class="modal-backdrop" id="modal-backdrop" hidden>
+    <section class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" aria-describedby="modal-roast" id="modal">
+      <header class="modal-head">
+        <div>
+          <p class="modal-kicker" id="modal-kicker">Run complete</p>
+          <h2 class="modal-title" id="modal-title">Nice.</h2>
+          <p class="modal-roast" id="modal-roast"></p>
+        </div>
+        <button class="icon-btn icon-btn--ghost" type="button" id="modal-close" aria-label="Close results">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"></path></svg>
+        </button>
+      </header>
+
+      <div class="modal-hero">
+        <figure class="gif-frame">
+          <img id="result-gif" alt="" width="220" height="150" decoding="async" />
+          <span class="gif-fallback" id="result-gif-fallback" aria-hidden="true">🎉</span>
+        </figure>
+        <div class="hero-score">
+          <span class="hero-tier" id="hero-tier">Tier — Average Human</span>
+          <p class="hero-wpm"><b id="hero-wpm">0</b><span>Net WPM</span></p>
+          <p class="hero-sub" id="hero-sub">0% accuracy · 0 mistakes</p>
+          <p class="hero-pb" id="hero-pb" hidden>🎉 New personal best <b id="pb-delta">+0</b></p>
+        </div>
+      </div>
+
+      <dl class="result-grid">
+        <div><dt>Gross WPM</dt><dd id="res-gross">0</dd></div>
+        <div><dt>Accuracy (first pass)</dt><dd id="res-acc">100%</dd></div>
+        <div><dt>Corrected accuracy</dt><dd id="res-acc-live">100%</dd></div>
+        <div><dt>Mistakes left</dt><dd id="res-mistakes">0</dd></div>
+        <div><dt>Keystrokes</dt><dd id="res-keys">0</dd></div>
+        <div><dt>Corrected errors</dt><dd id="res-fixed">0</dd></div>
+        <div><dt>Consistency</dt><dd id="res-consistency">—</dd></div>
+        <div><dt>Best combo</dt><dd id="res-combo">0</dd></div>
+      </dl>
+
+      <section class="graph-block" aria-labelledby="graph-title">
+        <h3 class="block-title" id="graph-title">Speed over time</h3>
+        <div class="graph-wrap">
+          <svg class="graph" id="wpm-graph" viewBox="0 0 600 160" preserveAspectRatio="none" role="img" aria-labelledby="graph-desc">
+            <title id="graph-desc">Net words per minute sampled once per second during the run</title>
+          </svg>
+        </div>
+        <p class="graph-legend"><span class="legend-swatch legend-swatch--line"></span> your net WPM <span class="legend-swatch legend-swatch--target"></span> 60 WPM reference</p>
+      </section>
+
+      <section class="heatmap-block" aria-labelledby="heat-title">
+        <h3 class="block-title" id="heat-title">Where you bled</h3>
+        <div class="heatmap" id="heatmap" role="img" aria-label="Keyboard heat map of your mistyped keys"></div>
+        <p class="heat-note" id="heat-note">No missed keys. Suspicious.</p>
+        <button class="btn btn--tonal btn--sm" type="button" id="btn-drill" hidden>
+          Practice my worst keys
+        </button>
+      </section>
+
+      <footer class="modal-foot">
+        <button class="btn btn--filled" type="button" id="btn-again">Try again</button>
+        <button class="btn btn--outlined" type="button" id="btn-next">New quote</button>
+      </footer>
+    </section>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <canvas class="confetti" id="confetti" aria-hidden="true"></canvas>
+
+  <script src="script.js" defer></script>
+</body>
+</html>
